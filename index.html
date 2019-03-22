@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>vue-test</title>
+  </head>
+
+  <body>
+    <div id="app">
+      <p>{{ message }}</p>
+      <span :title="message">
+        Hover over me!
+      </span>
+      <br />
+      <button @click="showMe">Click me!</button>
+      <span v-if="seen">Now you see me</span>
+      <br />
+      <h1>{{ toDoTitle }}</h1>
+      <ul>
+        <todo-item :on-remove="remItem" :index="index"  v-for="(item, index) in toDo" :todo="item" :key="index"></todo-item>
+      </ul>
+      <div>
+        <h2>Add new items!</h2>
+        <p>{{newItem}}</p>
+        <button @click="addItem">Add</button>
+        <!-- v-model for 2 way binding such as forms -->
+        <input  v-model="newItem" type="text" placeholder="Enter new item here"></input>
+        <br />
+
+      </div>
+    </div>
+  </body>
+
+  <!-- development version, includes helpful console warnings -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    // note the kebab-casing for usage in html
+    // child component
+    const TodoItem = Vue.component("todo-item", {
+      props: ['todo', "onRemove", "index"],
+      template: `<span><li>{{todo.text}} ||| {{reversed}}</li><button @click="onRemove(index)">X</button></span>`,
+      // note: computed properties are cached based on dependencies
+      // use methods if caching is undesirable
+      computed: {
+        reversed: function() {
+          return this.todo.text.split('').reverse().join('');
+        } 
+      },
+
+    })
+
+    // root
+    const app = new Vue({
+      el: "#app",
+      data: {
+        message: "Hello Vue.js!",
+        seen: false,
+        toDoTitle: "To Do List",
+        toDo: [
+          { text: "Learn JavaScript", isDone: false },
+          { text: "Learn Vue", isDone: false },
+          { text: "Build something awesome", isDone: false }
+        ],
+        newItem: ""
+      },
+      components: {
+        TodoItem,
+      },
+      methods: {
+        showMe: function() {
+          this.seen = !this.seen;
+        },
+        addItem: function () {
+          if (this.newItem === "") {
+            console.warn("Empty");
+            return;
+          }
+          this.toDo = [...this.toDo, {text:this.newItem, isDone: false}];
+          this.newItem = "";
+        },
+        remItem: function (index) {
+          this.toDo = this.toDo.filter((a,i) => i!==index);
+        }
+      }
+    });
+
+
+  </script>
+</html>
